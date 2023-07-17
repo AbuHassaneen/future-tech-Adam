@@ -5,20 +5,92 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+
     <link rel="stylesheet" href="style.css">
+
+
 </head>
 <body>
-    <h1>Lamborghini</h1>
-     <hr/>
-     
-    <p>
-        Lamborghini S.p.A. (Italian pronunciation: [automɔbili lamborgini]) is an Italian manufacturer of luxury sports cars and SUVs based in Sant'Agata Bolognese.<br> The company is owned by the Volkswagen Group through its subsidiary Audi.
+    <div>Teachable Machine Image Model</div>
+<button type="button" onclick="init()">Start</button>
+<div id="webcam-container"></div>
+<div id="label-container"></div>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
+<script type="text/javascript">
+    // More API functions here:
+    // https://github.com/googlecreativelab/teachablemachine-community/tree/master/libraries/image
 
-Ferruccio Lamborghini (1916-1993), an Italian manufacturing magnate, founded Automobili Ferruccio Lamborghini S.p.A. in 1963 to compete with Ferrari.<br> The company was noted for using a rear mid-engine, rear-wheel drive layout. Lamborghini grew rapidly during its first decade, <br> sales plunged in the wake of the 1973 worldwide financial downturn and the oil crisis. The firm's ownership changed three times after 1973, including a bankruptcy in 1978. American Chrysler Corporation took control of Lamborghini in 1987 and sold it to Malaysian investment group Mycom Setdco and Indonesian group V'Power Corporation in 1994. In 1998, Mycom Setdco and V'Power sold Lamborghini to the Volkswagen Group where it was placed under the control of the group's Audi division <width=70%></width> 
-    </p> 
-    <img src="https://upload.wikimedia.org/wikipedia/commons/9/97/Lamborghini_Aventador_LP700-4_Orange.jpg"width=30%>
-    <a href="https://www.lamborghini.com/en-en">More information about lamborghini</a> <width=50%></width> 
-    <a href="https://www.google.com/search?client=safari&rls=en&q=lamborghini+image&spell=1&sa=X&ved=2ahUKEwjshe-loImAAxXQzQIHHeO_B18QBSgAegQICBAB&biw=1437&bih=715&dpr=2"
-     >For more photos</a> <width=50%></width>
+    // the link to your model provided by Teachable Machine export panel
+    const URL = "https://teachablemachine.withgoogle.com/models/LWGj_xiwC/";
+
+    let model, webcam, labelContainer, maxPredictions;
+
+    // Load the image model and setup the webcam
+    async function init() {
+        const modelURL = URL + "model.json";
+        const metadataURL = URL + "metadata.json";
+
+        // load the model and metadata
+        // Refer to tmImage.loadFromFiles() in the API to support files from a file picker
+        // or files from your local hard drive
+        // Note: the pose library adds "tmImage" object to your window (window.tmImage)
+        model = await tmImage.load(modelURL, metadataURL);
+        maxPredictions = model.getTotalClasses();
+
+        // Convenience function to setup a webcam
+        const flip = true; // whether to flip the webcam
+        webcam = new tmImage.Webcam(200, 200, flip); // width, height, flip
+        await webcam.setup(); // request access to the webcam
+        await webcam.play();
+        window.requestAnimationFrame(loop);
+
+        // append elements to the DOM
+        document.getElementById("webcam-container").appendChild(webcam.canvas);
+        labelContainer = document.getElementById("label-container");
+        for (let i = 0; i < maxPredictions; i++) { // and class labels
+            labelContainer.appendChild(document.createElement("div"));
+        }
+    }
+
+    async function loop() {
+        webcam.update(); // update the webcam frame
+        await predict();
+        window.requestAnimationFrame(loop);
+    }
+
+    // run the webcam image through the image model
+    async function predict() {
+        // predict can take in an image, video or canvas html element
+        const prediction = await model.predict(webcam.canvas);
+        for (let i = 0; i < maxPredictions; i++) {
+            const classPrediction =
+                prediction[i].className + ": " + prediction[i].probability.toFixed(2);
+            labelContainer.childNodes[i].innerHTML = classPrediction;
+        }
+    }
+</script>
+
+    <h1 id="number"></h1>
+
+   <div class="container">
+    <center>
+    <form onsubmit="event.preventDefault();
+    console.log(document.getElementById('number').value);
+     conversationUserAdd(document.getElementById('input-text').value, document.
+     getElementById('number').value); openai_test();">
+
+    <input id="input-text" type="text" placeholder="type something">
+    <br>
+    <button id="submit-button">submit</button>
+   </form>
+</center>
+</div>
+
 </body>
+<script src="script.js"></script>
 </html>
+
+
+
+
